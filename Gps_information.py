@@ -50,7 +50,7 @@ class GpsInformation:
         elif nmea_sentence.startswith('$GPRMC'):
 
             nmea_sentence = nmea_sentence.split(',')
-            self.dat = (nmea_sentence[9])
+            self.date = (nmea_sentence[9])
             self.ground_speed = (nmea_sentence[7])
 
         elif nmea_sentence.startswith('$GPGSV'):
