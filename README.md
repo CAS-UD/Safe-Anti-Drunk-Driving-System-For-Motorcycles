@@ -108,7 +108,7 @@ On the other hand, the `GPS` sensor uses serial communication that in this case 
 ```bash
 from machine import UART
 
-uart = (2, baudrate = 9600, rx = 16)
+uart = UART(2, baudrate = 9600, rx = 16)
 
 while True:
     if uart.any():
