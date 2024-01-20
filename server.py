@@ -9,10 +9,8 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 @app.route('/api', methods=['POST'])
 def capture_all_post_requests():
     data = request.get_data(as_text=True)
-    print(f"Capturada solicitud POST: {data}")
-    socketio.emit('message', data)
+    socketio.emit('post_req', data)
     return "OK"
-
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
