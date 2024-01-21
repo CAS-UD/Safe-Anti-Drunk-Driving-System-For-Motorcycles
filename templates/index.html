@@ -8,7 +8,27 @@
 </head>
 <body>
 
-<div id="response"></div>
+<div id="section1">
+    <h2>Sección 1</h2>
+    <div id="content"></div>
+    <!-- Contenido de la primera sección -->
+</div>
+
+<div id="section2">
+    <h2>Sección 2</h2>
+    <!-- Contenido de la segunda sección -->
+</div>
+
+<div id="section3">
+    <h2>Sección 3</h2>
+    <!-- Contenido de la tercera sección -->
+</div>
+
+<div id="section4">
+    <h2>Respuesta de Solicitudes POST</h2>
+    <div id="verificacion"></div>
+</div>
+
 <input type="text" id="postData">
 <button onclick="sendPostRequest()">Enviar Solicitud POST</button>
 
@@ -16,11 +36,14 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
 socket.on('response', function(data) {
-    document.getElementById('response').innerHTML = data.content;
+    // Aquí puedes manejar la respuesta de otras secciones si es necesario
+    console.log(data);
 });
 
 socket.on('post_request_response', function(data) {
-    document.getElementById('response').innerHTML = data.content;
+    // Muestra el contenido en un div y la verificación en otro div
+    document.getElementById('content').innerHTML = `Contenido: ${data.content}`;
+    document.getElementById('verificacion').innerHTML = `Respuesta: ${data.verificacion}`;
 });
 
 function sendPostRequest() {
@@ -30,6 +53,22 @@ function sendPostRequest() {
 }
 </script>
 
+<style>
+    body {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    div {
+        border: 1px solid #ddd;
+        padding: 10px;
+    }
+
+    h2 {
+        margin-bottom: 5px;
+    }
+</style>
 </body>
 </html>
-

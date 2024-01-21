@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO
+from FuzzyLogic import verificar_inclinacion
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -8,18 +9,19 @@ socketio = SocketIO(app)
 def index():
     return render_template('index.html')
 
-@socketio.on('post_request')
-def handle_post_request(data):
-    content = data.get('content', '')
-    print(f"Data received: {content}")
-    socketio.emit('post_request_response', {'content': f"Respuesta del servidor: {content}"})
-
+#Del lado de la petición
 @app.route('/', methods=['POST'])
 def capture_all_post_requests():
     data = request.get_data(as_text=True)
     print(f"Capturada solicitud POST: {data}")
-    socketio.emit('post_request_response', {'content': f"Capturada solicitud POST: {data}"})
-    return "OK"
+    inclinacion_result = verificar_inclinacion(data)
+    response_data = {
+        'content': data,
+        'verificacion': inclinacion_result
+    }
+    socketio.emit('post_request_response', response_data)
+    return jsonify(response_data)
+
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)
