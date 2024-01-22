@@ -5,13 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask WebSocket Example</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+
 </head>
+
 <body>
 
+
+
 <div id="section1">
-    <h2>Sección 1</h2>
+    <h2>Collected Data</h2>
     <div id="content"></div>
-    <!-- Contenido de la primera sección -->
 </div>
 
 <div id="section2">
@@ -21,36 +24,36 @@
 
 <div id="section3">
     <h2>Sección 3</h2>
+    <div id="Img"></div>
     <!-- Contenido de la tercera sección -->
 </div>
 
 <div id="section4">
-    <h2>Respuesta de Solicitudes POST</h2>
+    <h2>Answer POST Request</h2>
     <div id="verificacion"></div>
 </div>
-
-<input type="text" id="postData">
-<button onclick="sendPostRequest()">Enviar Solicitud POST</button>
 
 <script>
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-socket.on('response', function(data) {
-    // Aquí puedes manejar la respuesta de otras secciones si es necesario
-    console.log(data);
-});
-
 socket.on('post_request_response', function(data) {
     // Muestra el contenido en un div y la verificación en otro div
-    document.getElementById('content').innerHTML = `Contenido: ${data.content}`;
-    document.getElementById('verificacion').innerHTML = `Respuesta: ${data.verificacion}`;
+    document.getElementById('content').innerHTML = `${data.content}`;
+    document.getElementById('verificacion').innerHTML = `${data.verificacion}`;
+
+    // Actualiza la imagen en función de data.verificacion
+    var imgDiv = document.getElementById('Img');
+    // Verifica el valor de data.verificacion y elige la imagen correspondiente
+    if (data.verificacion === 'IMU demasiado inclinado hacia adelante/atrás (eje X).') {
+        imgDiv.innerHTML = '<img src="static/InclinadaAdelante.png" alt="Adelante">';
+    } else if (data.verificacion === 'IMU demasiado inclinado hacia la derecha/izquierda (eje Y).') {
+        imgDiv.innerHTML = '<img src="static/InclinadaDerecha.png" alt="Derecha">';
+    } else {
+        imgDiv.innerHTML = '<img src="static/PosicionAceptable.png" alt="Aceptable">';
+    }
+
 });
 
-function sendPostRequest() {
-    var postData = document.getElementById('postData').value;
-    socket.emit('post_request', {content: postData});
-    document.getElementById('postData').value = '';  // Limpiar el campo después de enviar la solicitud
-}
 </script>
 
 <style>
