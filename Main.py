@@ -70,7 +70,7 @@ def sendData(timer_event):
             con.createConnection()
 
 # the timer is initialized (period is in miliseconds)
-timer.init(period = 200, mode = machine.Timer.PERIODIC, callback = sendData)             
+timer.init(period = 1000, mode = machine.Timer.PERIODIC, callback = sendData)             
 
 # This function is executed in parallel to the rest 
 # of the code, it is responsible for listening to the 
