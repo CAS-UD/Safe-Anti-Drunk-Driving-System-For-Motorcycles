@@ -62,7 +62,7 @@ def sendData(timer_event):
         req.dat.recordingData()                     
         if data_number_control == 0:      
             loadin_led.value(1)                     
-            print(req.send())                         
+            req.send()                        
             loadin_led.value(0)                     
             data_number_control = data_number_config + 1
     else:                                           
@@ -70,7 +70,7 @@ def sendData(timer_event):
             con.createConnection()
 
 # the timer is initialized (period is in miliseconds)
-timer.init(period = 1000, mode = machine.Timer.PERIODIC, callback = sendData)             
+timer.init(period = 250, mode = machine.Timer.PERIODIC, callback = sendData)             
 
 # This function is executed in parallel to the rest 
 # of the code, it is responsible for listening to the 
