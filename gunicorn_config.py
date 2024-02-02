@@ -1,10 +1,4 @@
-import multiprocessing 
-from gevent import monkey
-
-monkey.patch_all()
-
-worker_class = 'gevent'
-bind = '0.0.0.0:8000'
-debug = True
-workers = multiprocessing.cpu_count() * 2 + 1
+workers = 1
+worker_class = "geventwebsocket.gunicorn.workers.GeventWebSocketWorker"
+bind: "0.0.0.0:8000"
 
