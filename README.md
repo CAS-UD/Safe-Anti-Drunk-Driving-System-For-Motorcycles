@@ -1,15 +1,15 @@
 # Collection and sending of data through HTTP protocol with ESP32
 
-This project aims to collect and send sensor data using the HTTP protocol and the POST request with the ESP32 microcontroller. At the moment, an Inertial Measurement Unit (IMU) module is being used, which functions as a magnetometer, gyroscope, accelerometer, linear accelerometer, Euler angle meter, gravitational force meter and environmental thermometer. Additionally, the GY-NEO6MV2 sensor is used, which is a Global Positioning Systems (GPS) sensor which gives us position information, time zone, speed, etc.
+This project aims to collect and send sensor data using the HTTP protocol and the POST request with the `ESP32` microcontroller. At the moment, an `Inertial Measurement Unit (IMU)` module is being used, which functions as a magnetometer, gyroscope, accelerometer, linear accelerometer, Euler angle meter, gravitational force meter and environmental thermometer. Additionally, the `GY-NEO6MV2` sensor is used, which is a Global Positioning Systems (GPS) sensor which gives us position information, time zone, speed, etc.
 
 # Contents
 
 1. [Sensors used](./README.md#1-sensors-used)
- 2. [How to work with an esp32 from windows?](./README.md#2-how-to-work-with-an-esp32-from-windows)
- 3. [Obtaining data from sensors](./README.md#3-obtaining-data-from-sensors)  
+2. [How to work with an esp32 from windows?](./README.md#2-how-to-work-with-an-esp32-from-windows)
+3. [Obtaining data from sensors](./README.md#3-obtaining-data-from-sensors)  
   3.1 [PulluHow is data grouped?](./README.md#31-how-is-data-grouped)
-
-
+4. [Test files](./README.md#4-test-files)
+5. [Send HTTP request](./README.md#5-send-http-request)
 
 # 1. Sensors used
 
@@ -84,21 +84,34 @@ To extract data from the Inertial Measurement Unit `(IMU)` module using the ESP3
 
 - How to obtain data from the IMU?
 ```bash
+#WThis file allows you to verify the operation of the BNO055 module
+
 import machine
 import time
 from Bno055 import *
 
-i2c = machine.SoftI2C(scl=machine.Pin(22), sda=machine.Pin(21), timeout=100_000)
+# scl and sda pins of the BNO055 module connected to the () pin of the esp32
+scl_pin = 22
+sda_pin = 21
+
+
+i2c = machine.SoftI2C(scl=machine.Pin(scl_pin), sda=machine.Pin(sda_pin), timeout=100_000)
+
 imu = BNO055(i2c)
+
+calibrated = False
 while True:
     time.sleep(1)
-    print("temperature: ", imu.temperature())
-    print("magnetometer: ", imu.mag())
-    print("accelerometer: ", imu.accel())
-    print("gyroscope: ", imu.gyro())
-    print("linear_accelerometer: ", imu.lin_acc())
-    print("gravity: ", imu.gravity())
-    print("euler angles: ", imu.euler())
+    if not calibrated:
+        calibrated = imu.calibrated()
+        print('Calibration required: sys {} gyro {} accel {} mag {}'.format(*imu.cal_status()))
+    print('Temperature {}°C'.format(imu.temperature()))
+    print('Mag       x {:5.0f}    y {:5.0f}     z {:5.0f}'.format(*imu.mag()))
+    print('Gyro      x {:5.0f}    y {:5.0f}     z {:5.0f}'.format(*imu.gyro()))
+    print('Accel     x {:5.1f}    y {:5.1f}     z {:5.1f}'.format(*imu.accel()))
+    print('Lin acc.  x {:5.1f}    y {:5.1f}     z {:5.1f}'.format(*imu.lin_acc()))
+    print('Gravity   x {:5.1f}    y {:5.1f}     z {:5.1f}'.format(*imu.gravity()))
+    print('Heading     {:4.0f} roll {:4.0f} pitch {:4.0f}'.format(*imu.euler()))
 ```
 This code is a simple way to start the IMU module and print all its data.
 
@@ -133,13 +146,26 @@ Once the IMU module is started, the following functions can be used:
 The `NEO-6M` module sends standard sentences from the National Marine Electronics Association `(NMEA)`, these sentences are processed in the [`Gps_information.py`](./Gps_information.py) file. To use it, do it as follows:
 
 ```bash
-from Gps_information import *
+# This file allows you to verify the operation of the GPS sensor
 
-gps = Gps_information()
+from machine import *
+from Gps_information import  *
 
-gps.nmeaSentenceOrganizer(time_zone, nmea_sentence)
+# tx and rx pin of the gps connected to the () pin of the esp32
+tx_pin = 16
+rx_pin = 17
 
-print(gps.getGps_information())
+gps = machine.UART(2, tx=rx_pin, rx=tx_pin, baudrate=9600)
+
+while True:
+
+    if gps.any():
+        nmea = gps.decode('UTF-8')
+        GpsInformation.nmeaSentenceOrganizer(time_zone= -5, nmea_sentence=nmea)
+        gps_info = GpsInformation.getGps_information()
+        print(gps_info)
+
+    pass
 
 ```
 `.getGps_information()` returns a `tuple` organized as follows:
@@ -154,3 +180,45 @@ print(gps.getGps_information())
 |5|satelites_in_view|
 |6|satelites_in_use|
 |7|Antenna_height [meters]|
+
+# 4 Test files
+
+In the Test/ street you will find 2 scripts that will help you identify the proper functioning of the sensors without the need to upload and execute all the files on the ESP32.
+
+To use them you should upload the file you want along with the library you use:
+
+|file|library|
+|--------|--------|
+|Bno055Test.py|Bno055.py|
+|GpsTest.py|Gps_information.py|
+
+# 5 Send HTTP request
+
+To guarantee that HTTP requests can be made through the ESP32, it needs to be connected to the Internet. To do this, use the [Conecction.py](./Connection.py) file, which receives as an argument the name and password of the network to connect.
+
+The [Send_Request.py](./Send_Requests.py) file is first responsible for collecting all the data obtained from both the Bno055 and GPS sensor and grouping them into a Json file that will later be sent by the body of the request. For this use, [Send_Request.py](./Send_Requests.py) will only need the url to which it sends the request and its body.
+
+The library is already installed on the ESP32 so it will only be a matter of importing it:
+
+``` bash x
+import urequest
+```
+the instance that allows us to do this is:
+
+``` bash x
+urequests.post(self.url, json=json_body)
+```
+
+# 6 configurations file
+
+The [Config.py](./Config.py) file stores variables that are constant throughout the program, in this case:
+
+- network name
+- password name 
+- Url to Send HTPP request 
+- SCL and SDA pin to which the Bno055 sensor is connected
+- Tx pin to which the gps connects
+- Time zone
+
+Univerdiad Distrital Fransico Jose de Caldas
+Grupo de investigacion CAS ( Ciruits And Systems ).
