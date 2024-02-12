@@ -2,46 +2,57 @@ import numpy as np
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
 
-pitch = ctrl.Antecedent(np.arange(-180, 181, 1), 'pitch')
-roll = ctrl.Antecedent(np.arange(0, 90, 1), 'roll')
-velocity = ctrl.Antecedent(np.arange(0, 61, 1), 'velocity')
+class Fuzylogic:
 
-pitch['izquierda'] = fuzz.trimf(pitch.universe, [-180, -180, 0])
-pitch['centro'] = fuzz.trimf(pitch.universe, [-30, 0, 30])
-pitch['derecha'] = fuzz.trimf(pitch.universe, [0, 180, 180])
+    def __init__(self):
 
-roll['bajo'] = fuzz.trimf(roll.universe, [0, 0, 20])
-roll['medio'] = fuzz.trimf(roll.universe, [15, 20, 25])
-roll['alto'] = fuzz.trimf(roll.universe, [20, 90, 90])
+        self.pitch = ctrl.Antecedent(np.arange(-180, 181, 1), 'pitch')
+        self.roll = ctrl.Antecedent(np.arange(0, 90, 1), 'roll')
+        self.velocity = ctrl.Antecedent(np.arange(0, 61, 1), 'velocity')
 
-velocity['baja'] = fuzz.trimf(velocity.universe, [0, 0, 40])
-velocity['alta'] = fuzz.trimf(velocity.universe, [30, 60, 60])
+        self.pitch['izquierda'] = fuzz.trimf(self.pitch.universe, [-180, -180, 0])
+        self.pitch['centro'] = fuzz.trimf(self.pitch.universe, [-30, 0, 30])
+        self.pitch['derecha'] = fuzz.trimf(self.pitch.universe, [0, 180, 180])
 
-drive = ctrl.Consequent(np.arange(0, 101, 1), 'drive')
+        self.roll['bajo'] = fuzz.trimf(self.roll.universe, [0, 0, 20])
+        self.roll['medio'] = fuzz.trimf(self.roll.universe, [15, 20, 25])
+        self.roll['alto'] = fuzz.trimf(self.roll.universe, [20, 90, 90])
 
-drive['baja'] = fuzz.trimf(drive.universe, [0, 0, 60])
-drive['alta'] = fuzz.trimf(drive.universe, [40, 100, 100])
+        self.velocity['baja'] = fuzz.trimf(self.velocity.universe, [0, 0, 40])
+        self.velocity['alta'] = fuzz.trimf(self.velocity.universe, [30, 60, 60])
 
-rule1 = ctrl.Rule(pitch['izquierda'] & velocity['baja'], drive['alta'])
-rule2 = ctrl.Rule(pitch['derecha'] & velocity['alta'], drive['alta'])
-rule3 = ctrl.Rule(pitch['centro'] & velocity['alta'], drive['alta'])
-rule4 = ctrl.Rule(pitch['centro'] & velocity['baja'], drive['alta'])
-rule5 = ctrl.Rule(pitch['izquierda'] & velocity['baja'], drive['baja'])
-rule6 = ctrl.Rule(pitch['derecha'] & velocity['baja'], drive['baja'])
-rule7 = ctrl.Rule(roll['alto'] & velocity['alta'], drive['baja'])
-rule8 = ctrl.Rule(roll['bajo'] & velocity['alta'], drive['alta'])
-rule9 = ctrl.Rule(roll['alto'] & velocity['baja'], drive['alta'])
-rule10 = ctrl.Rule(roll['bajo'] & velocity['baja'], drive['alta'])
-rule11 = ctrl.Rule(roll['medio'] & velocity['alta'], drive['baja'])
-rule12 = ctrl.Rule(roll['medio'] & velocity['baja'], drive['alta'])
+        self.drive = ctrl.Consequent(np.arange(0, 101, 1), 'drive')
 
-drive_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10, rule11, rule12])
-drive_sim = ctrl.ControlSystemSimulation(drive_ctrl)
-drive_sim.input['pitch'] = 0
-drive_sim.input['roll'] = 0
-drive_sim.input['velocity'] = 60
+        self.drive['baja'] = fuzz.trimf(self.drive.universe, [0, 0, 60])
+        self.drive['alta'] = fuzz.trimf(self.drive.universe, [40, 100, 100])
 
+        self.rule1 = ctrl.Rule(self.pitch['izquierda'] & self.velocity['baja'], self.drive['alta'])
+        self.rule2 = ctrl.Rule(self.pitch['derecha'] & self.velocity['alta'], self.drive['alta'])
+        self.rule3 = ctrl.Rule(self.pitch['centro'] & self.velocity['alta'], self.drive['alta'])
+        self.rule4 = ctrl.Rule(self.pitch['centro'] & self.velocity['baja'], self.drive['alta'])
+        self.rule5 = ctrl.Rule(self.pitch['izquierda'] & self.velocity['baja'], self.drive['baja'])
+        self.rule6 = ctrl.Rule(self.pitch['derecha'] & self.velocity['baja'], self.drive['baja'])
+        self.rule7 = ctrl.Rule(self.roll['alto'] & self.velocity['alta'], self.drive['baja'])
+        self.rule8 = ctrl.Rule(self.roll['bajo'] & self.velocity['alta'], self.drive['alta'])
+        self.rule9 = ctrl.Rule(self.roll['alto'] & self.velocity['baja'], self.drive['alta'])
+        self.rule10 = ctrl.Rule(self.roll['bajo'] & self.velocity['baja'], self.drive['alta'])
+        self.rule11 = ctrl.Rule(self.roll['medio'] & self.velocity['alta'], self.drive['baja'])
+        self.rule12 = ctrl.Rule(self.roll['medio'] & self.velocity['baja'], self.drive['alta'])
+        drive_ctrl = ctrl.ControlSystem([self.rule1, self.rule2, self.rule3, self.rule4, self.rule5, self.rule6, self.rule7, self.rule8, self.rule9, self.rule10, self.rule11, self.rule12])
+        self.drive_sim = ctrl.ControlSystemSimulation(drive_ctrl)
+        self.drive_sim.input['pitch'] = 0
+        self.drive_sim.input['roll'] = 0
+        self.drive_sim.input['velocity'] = 0
 
-drive_sim.compute()
-print(drive_sim.output['drive'])
+    def AsingValue(self, data):
+        pitch = float(data['Euler'][2])
+        roll = float(data['Euler'][1])
+        velocity = float(data['GroundSpeed'][0])
+        self.drive_sim.input['pitch'] = round(roll)
+        self.drive_sim.input['roll'] = round(pitch)
+        self.drive_sim.input['velocity'] = round(velocity)
+
+    def Calculate(self):
+        self.drive_sim.compute()
+        return self.drive_sim.output['drive']
 
