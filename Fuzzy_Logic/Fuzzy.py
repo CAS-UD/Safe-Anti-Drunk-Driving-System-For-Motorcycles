@@ -59,22 +59,3 @@ class Fuzylogic:
     def Calculate(self):
         self.drive_sim.compute()
         return self.drive_sim.output['drive']
-
-    def CalculateDesition(self, percent, time):
-        if percent < 50 and time < 30:
-            self.counter += 1
-            self.time_activate = False
-            self.desition = False
-            return (self.desition, self.time_activate)
-        elif time >= 30:
-            self.counter = 0
-            self.time_activate = True
-            return (self.desition, self.time_activate)
-        elif self.counter == 5:
-            self.counter = 0
-            self.desition = True
-            self.time_activate = True
-            return (self.desition, self.time_activate)
-
-
-
