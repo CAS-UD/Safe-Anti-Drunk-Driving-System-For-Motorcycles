@@ -6,6 +6,10 @@ class Fuzylogic:
 
     def __init__(self):
 
+        self.counter = 0
+        self.desition = False
+        self.time_activate = False
+
         self.pitch = ctrl.Antecedent(np.arange(-180, 181, 1), 'pitch')
         self.roll = ctrl.Antecedent(np.arange(0, 90, 1), 'roll')
         self.velocity = ctrl.Antecedent(np.arange(0, 61, 1), 'velocity')
@@ -18,7 +22,7 @@ class Fuzylogic:
         self.roll['medio'] = fuzz.trimf(self.roll.universe, [15, 20, 25])
         self.roll['alto'] = fuzz.trimf(self.roll.universe, [20, 90, 90])
 
-        self.velocity['baja'] = fuzz.trimf(self.velocity.universe, [0, 0, 40])
+        self.velocity['baja'] = fuzz.trimf(self.velocity.universe, [0 , 0, 40])
         self.velocity['alta'] = fuzz.trimf(self.velocity.universe, [30, 60, 60])
 
         self.drive = ctrl.Consequent(np.arange(0, 101, 1), 'drive')
@@ -55,4 +59,3 @@ class Fuzylogic:
     def Calculate(self):
         self.drive_sim.compute()
         return self.drive_sim.output['drive']
-
