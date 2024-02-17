@@ -5,6 +5,7 @@
 import Connection
 import Send_Requests
 from Bno055 import *
+import Action
 
 import uasyncio
 import machine
@@ -27,6 +28,15 @@ try:
     # The NEO-6mv2 (gps) sensor variables are configured
     tx_pin_config = int(Config.configuration['gps']['tx_pin'])
     time_zone_config = int(Config.configuration['gps']['time_zone'])
+
+    # The motor variables are configured
+    motot_dir_pin_config = int(Config.configuration['motor']['dir_pin'])
+    motot_step_pin_config = int(Config.configuration['motor']['step_pin'])
+    motot_enable_pin_config = int(Config.configuration['motor']['enable_pin'])
+    revolution_config = int(Config.configuration['motor']['revolution'])
+
+    # The relay variables are configured
+    rele_pin__config = int(Config.configuration['rele']['rele_pin'])
 except ImportError as e:
     print('error to open or read the configuration file: ', e)
 
@@ -42,6 +52,7 @@ uart = machine.UART(2, baudrate = 9600, rx = tx_pin_config)
 con = Connection.Connection(wifi_name=sddi_config, password=password_config)    
 req = Send_Requests.SendRequest(url_config, bno055_scl_pin_config, bno055_sda_pin_config, data_number_config, tx_pin_config, time_zone_config) 
 data_number_control = data_number_config
+act = Action.Action(motot_dir_pin_config, motot_step_pin_config, motot_enable_pin_config, revolution_config, rele_pin__config, activation=False)
 loadin_led = machine.Pin(2, machine.Pin.OUT)
    
 
@@ -61,13 +72,13 @@ def sendData(timer_event):
         data_number_control -= 1
         req.dat.recordingData()                     
         if data_number_control == 0:      
-            loadin_led.value(1)                     
-            req.send()                        
-            loadin_led.value(0)                     
+            loadin_led.value(1)
+            verify_activation = act.VerifyActivation(req.send())
+            if verify_activation == True:
+                act.EnableRele()
+                act.ClockwiseRotation()
+            loadin_led.value(0)                    
             data_number_control = data_number_config + 1
-    else:                                           
-        if time.time() % 30 == 0:
-            con.createConnection()
 
 # the timer is initialized (period is in miliseconds)
 timer.init(period = 250, mode = machine.Timer.PERIODIC, callback = sendData)             
