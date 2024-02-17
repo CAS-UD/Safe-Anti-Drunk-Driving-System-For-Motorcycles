@@ -62,18 +62,18 @@ class GpsInformation:
                 self.local_time = [':'.join(aux_time[:3])]
             except Exception as e:
                 print("invalid time: ", nmea_sentence[1] )
-            self.Antenna_height = [0] if nmea_sentence[9] == '' else [nmea_sentence[9]]
-            self.satelites_in_use = [0] if nmea_sentence[7] == '' else [nmea_sentence[7]] 
+            self.Antenna_height = 0 if nmea_sentence[9] == '' else [nmea_sentence[9]]
+            self.satelites_in_use = 0 if nmea_sentence[7] == '' else [nmea_sentence[7]] 
 
         elif nmea_sentence.startswith('$GPRMC'):
 
             nmea_sentence = nmea_sentence.split(',')
-            self.date = [0] if nmea_sentence[9] == '' else [nmea_sentence[9]]
-            self.ground_speed = [0] if nmea_sentence[7] == '' else (float([nmea_sentence[7]]) * 1.852)
+            self.date = 0 if nmea_sentence[9] == '' else [nmea_sentence[9]]
+            self.ground_speed = 0 if nmea_sentence[7] == '' else (float([nmea_sentence[7]]) * 1.852)
 
         elif nmea_sentence.startswith('$GPGSV'):
             nmea_sentence = nmea_sentence.split(',')
-            self.satelites_in_view = [0] if nmea_sentence[3] == '00*79' else [nmea_sentence[3]]
+            self.satelites_in_view = 0 if nmea_sentence[3] == '00*79' else [nmea_sentence[3]]
 
     # The function returns the values of all the variables (type: tuple)
     def getGps_information(self):
