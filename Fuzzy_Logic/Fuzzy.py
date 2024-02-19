@@ -49,9 +49,10 @@ class Fuzylogic:
         self.drive_sim.input['velocity'] = 0
 
     def AsingValue(self, data):
-        pitch = float(data['Euler'][2])
-        roll = float(data['Euler'][1])
-        velocity = float(data['GroundSpeed'][0])
+        pitch = float(data['Euler'][0][2])
+        roll = float(data['Euler'][0][1])
+        print('p y r', pitch, '^', roll)
+        velocity = float(data['GroundSpeed'])
         self.drive_sim.input['pitch'] = round(roll)
         self.drive_sim.input['roll'] = round(pitch)
         self.drive_sim.input['velocity'] = round(velocity)

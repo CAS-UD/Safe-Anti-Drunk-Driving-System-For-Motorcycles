@@ -48,8 +48,10 @@ def capture_all_post_requests():
     global est
     data = request.get_data(as_text=True)
     socketio.emit('post_req', data)
+    print (data)
     fuzzy.AsingValue(json.loads(data))
     fuzzy_cal = round(float(fuzzy.Calculate()),3)
+    print(fuzzy_cal)
     if est:
         return "True"
     else:
