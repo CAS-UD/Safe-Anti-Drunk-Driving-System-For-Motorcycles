@@ -1,6 +1,8 @@
 import numpy as np
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
+import matplotlib.pyplot as plt
+
 
 class Fuzylogic:
 
@@ -15,15 +17,15 @@ class Fuzylogic:
         self.velocity = ctrl.Antecedent(np.arange(0, 61, 1), 'velocity')
 
         self.pitch['izquierda'] = fuzz.trimf(self.pitch.universe, [-180, -180, 0])
-        self.pitch['centro'] = fuzz.trimf(self.pitch.universe, [-30, 0, 30])
+        self.pitch['centro'] = fuzz.trimf(self.pitch.universe, [-15, 0, 15])
         self.pitch['derecha'] = fuzz.trimf(self.pitch.universe, [0, 180, 180])
 
         self.roll['bajo'] = fuzz.trimf(self.roll.universe, [0, 0, 20])
         self.roll['medio'] = fuzz.trimf(self.roll.universe, [15, 20, 25])
         self.roll['alto'] = fuzz.trimf(self.roll.universe, [20, 90, 90])
 
-        self.velocity['baja'] = fuzz.trimf(self.velocity.universe, [0 , 0, 40])
-        self.velocity['alta'] = fuzz.trimf(self.velocity.universe, [30, 60, 60])
+        self.velocity['baja'] = fuzz.trimf(self.velocity.universe, [0 , 0, 25])
+        self.velocity['alta'] = fuzz.trimf(self.velocity.universe, [15, 150, 150])
 
         self.drive = ctrl.Consequent(np.arange(0, 101, 1), 'drive')
 
@@ -60,3 +62,10 @@ class Fuzylogic:
     def Calculate(self):
         self.drive_sim.compute()
         return self.drive_sim.output['drive']
+    def Show(self):
+        self.roll.view()
+        self.pitch.view()
+        self.velocity.view()
+        self.drive.view()
+        plt.show()
+
