@@ -52,12 +52,14 @@ uart = machine.UART(2, baudrate = 9600, rx = tx_pin_config)
 con = Connection.Connection(wifi_name=sddi_config, password=password_config)    
 req = Send_Requests.SendRequest(url_config, bno055_scl_pin_config, bno055_sda_pin_config, data_number_config, tx_pin_config, time_zone_config) 
 data_number_control = data_number_config
-act = Action.Action(motot_dir_pin_config, motot_step_pin_config, motot_enable_pin_config, revolution_config, rele_pin__config, activation=False)
+act = Action.Action(motot_dir_pin_config, motot_step_pin_config, motot_enable_pin_config, revolution_config, rele_pin__config)
 loadin_led = machine.Pin(2, machine.Pin.OUT)
    
 
 # Calls the createConnection function which establishes the internet connection
-con.createConnection()
+# con.createConnection()
+
+act.EnableRele()
 
 # The function is responsible for saving a certain
 # amount of data which is established by data_number_control, 
@@ -73,10 +75,12 @@ def sendData(timer_event):
         req.dat.recordingData()                     
         if data_number_control == 0:      
             loadin_led.value(1)
-            verify_activation = act.VerifyActivation(req.send())
-            if verify_activation == True:
-                act.EnableRele()
-                act.ClockwiseRotation()
+            req.send()
+            # print(a)
+            # verify_activation = act.VerifyActivation(a)
+            # if verify_activation == True:
+            #     act.EnableRele()
+            #     act.ClockwiseRotation()
             loadin_led.value(0)                    
             data_number_control = data_number_config + 1
 

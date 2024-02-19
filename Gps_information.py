@@ -10,7 +10,7 @@
 #   Input: $GPRMC, 123519, A, 4807.038, N, 01131.000, E, 022.4, 084.4, 230394, 003.1, W, * 6A
 #   Output: date: 230394, ground speed: 41.3688
 
-from machine import UART
+#from machine import UART
 import time
 
 class GpsInformation:
@@ -69,7 +69,7 @@ class GpsInformation:
 
             nmea_sentence = nmea_sentence.split(',')
             self.date = 0 if nmea_sentence[9] == '' else [nmea_sentence[9]]
-            self.ground_speed = 0 if nmea_sentence[7] == '' else (float([nmea_sentence[7]]) * 1.852)
+            self.ground_speed = 0 if nmea_sentence[7] == '' else  (float(nmea_sentence[7]) * 1.852)
 
         elif nmea_sentence.startswith('$GPGSV'):
             nmea_sentence = nmea_sentence.split(',')

@@ -41,9 +41,14 @@ class SendRequest:
             'SatelitesInUse' : data_gps[6],
             'AntennaHeight' : data_gps[7]
             }
-            res = urequests.post(self.url, json=json_body)
+            try:
+                with open('data.txt', 'a') as file:
+                    file.write(str(json_body))
+            except Exception as e:
+                print('error to open or read the configuration file: ', e)
+            #res = urequests.post(self.url, json=json_body)
             fin = time.ticks_ms()
             print("el tiempo fue: ", fin-inicio)
-            return res.text
+            return "False"
         except Exception as e:
             print("An error occurred while submitting a request: ", e)
