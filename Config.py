@@ -8,7 +8,7 @@ configuration = {
         'Password': '123456789',
     },
     'requests': {
-        'Url': 'http://192.168.48.15:80/api/send_data',
+        'Url': 'http://192.168.201.15:80/api/send_data',
         'Datanumber': '1'
     },
     'bno055':{
@@ -23,7 +23,7 @@ configuration = {
         'dir_pin' : '15',
         'step_pin' : '4',
         'enable_pin' : '23',
-        'revolution' : '200'
+        'revolution' : '25'
     },
     'rele' : {
         'rele_pin' : '32'

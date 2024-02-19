@@ -1,4 +1,10 @@
+# This class is responsible for the actions of the stepper motor.
+# It has the methods to rotate the motor clockwise and counterclockwise,
+# and to enable and disable the relay. It also has a method to verify the
+# activation of the motor.
+
 import machine
+import time
 
 class Action():
     
@@ -21,9 +27,9 @@ class Action():
         self.pin_dir.on()
         for i in range(0, self.revolution):
             self.pin_step.on()
-            machine.time.sleep_ms(1)
+            time.sleep_ms(1)
             self.pin_step.off()
-            machine.time.sleep_ms(1)
+            time.sleep_ms(1)
     
     def AnticlockwiseRotation(self):
         self.pin_dir.off()
